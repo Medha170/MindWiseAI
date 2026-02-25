@@ -27,7 +27,7 @@ export default function Assessment() {
           {["Not at all", "Several days", "More than half the days", "Nearly every day"].map((option, index) => (
             <button 
               key={index}
-              className="w-full rounded-xl border border-slate-200 p-4 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="w-full rounded-xl border border-slate-200 p-4 text-left text-slate-700 hover:border-blue-500 hover:bg-blue-50 transition-colors"
               onClick={() => setStep(step < 5 ? step + 1 : 5)}
             >
               {option}
