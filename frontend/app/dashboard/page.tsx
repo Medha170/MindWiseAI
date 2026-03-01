@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export default function Dashboard() {
-  const [selectedMood, setSelectedMood] = useState(null);
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [journalEntry, setJournalEntry] = useState("");
   const [aiReflection, setAiReflection] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
