@@ -6,7 +6,7 @@ export default function Assessment() {
   const [step, setStep] = useState(1);
   const router = useRouter(); // Initialize the router
 
-  const handleOptionClick = (optionIndex) => {
+  const handleOptionClick = (optionIndex: number) => {
     if (step < 5) {
       setStep(step + 1);
     } else {
