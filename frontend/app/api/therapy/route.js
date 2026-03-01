@@ -1,31 +1,49 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Initialize the Gemini API client using your environment variable
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(request) {
   try {
-    // Parse the incoming JSON from Postman
     const body = await request.json();
     const { userMessage, assessmentProfile } = body;
 
-    // In the real app, this is where you call OpenAI/Anthropic. 
-    // For the demo, we are mocking the AI's personalized response.
-    
-    let aiResponse = "";
+    // We are using gemini-1.5-flash because it is fast and perfect for text chat
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    if (assessmentProfile.stress === "High") {
-      aiResponse = `I hear you. Dealing with high stress is exhausting. Since you mentioned feeling overwhelmed, would you like to try a quick 2-minute grounding exercise?`;
-    } else {
-      aiResponse = `Thank you for sharing that with me. How can I support you best right now?`;
-    }
+    // Constructing the prompt with the user's psychological profile
+    const prompt = `
+      You are MindWise AI, an empathetic, non-judgmental, and supportive conversational agent. 
+      Your primary audience is college students and young professionals dealing with academic pressure and burnout.
+      
+      User's Current Assessment Profile:
+      - Stress Level: ${assessmentProfile?.stress || 'Unknown'}
+      - Anxiety: ${assessmentProfile?.anxiety || 'Unknown'}
+      
+      Guidelines for your response:
+      1. Validate the user's feelings and mirror a calming, therapeutic tone.
+      2. Keep responses concise (under 3-4 sentences) as this is a chat interface.
+      3. Gently suggest one small, actionable coping mechanism related to their assessment profile.
+      4. Do not attempt to diagnose or provide medical advice.
 
-    // Return the response as JSON
+      The user says: "${userMessage}"
+    `;
+
+    // Call the AI
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const aiText = response.text();
+
+    // Return the generated text to the frontend
     return NextResponse.json({ 
       status: "success",
       role: "assistant",
-      content: aiResponse,
-      context_used: assessmentProfile 
+      content: aiText
     });
 
   } catch (error) {
-    return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
+    console.error("AI Generation Error:", error);
+    return NextResponse.json({ error: "Failed to generate AI response" }, { status: 500 });
   }
 }
